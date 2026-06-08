@@ -18,14 +18,14 @@
         }
 
         .contenedor-botones {
-            display: grid;
-            grid-template-columns: repeat(5, 250px);
-            gap: 15px;
+            display: flex;
             justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .boton {
-            display: block;
+            display: inline-block;
             width: 250px;
             padding: 15px;
             background-color: #4CAF50;
@@ -43,7 +43,7 @@
 
         .volver {
             background-color: #e74c3c;
-            margin: 30px auto 0;
+            margin-top: 30px;
         }
 
         .volver:hover {
@@ -63,6 +63,8 @@
         <a href="https://chonni777.github.io/minecraft2/" class="boton">Minecraft</a>
         <a href="https://chonni777.github.io/FNAF1/" class="boton">Five Nights at Freddy's</a>
     </div>
+
+    <br>
 
     <a href="https://chonni777.github.io/Calendari-Vicent-Plantada/" class="boton volver">⬅ Volver</a>
 
