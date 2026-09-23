@@ -205,3 +205,26 @@ footer a { color: var(--lavender); }
   .bezel { padding: 8px; border-radius: 12px; }
   .inline { flex-direction: column; }
 }
+
+/* ===== Modo solo juego (abierto desde la página de juegos) ===== */
+body.solo { background: #000; height: 100vh; overflow: hidden; }
+body.solo .console {
+  max-width: none; height: 100%; padding: 0;
+  display: flex; flex-direction: column;
+}
+body.solo .back-link,
+body.solo .console-top,
+body.solo #selector,
+body.solo #help,
+body.solo footer,
+body.solo #change-game { display: none; }
+body.solo #status { margin: 0; padding: 4px; min-height: 0; }
+body.solo #status:not(.error) { display: none; }
+body.solo .bezel {
+  flex: 1; min-height: 0;
+  padding: 0; border-radius: 0; background: #000; box-shadow: none;
+}
+body.solo #game-wrap { height: 100%; aspect-ratio: auto; border-radius: 0; }
+body.solo #controls-bar { margin: 0; padding: 8px; gap: 8px; background: #14141f; }
+body.solo .btn { padding: 6px 12px; font-size: 0.9rem; }
+body.solo .btn-small { width: 36px; padding: 6px 0; }

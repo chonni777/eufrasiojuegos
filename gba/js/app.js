@@ -14,6 +14,11 @@ const playBtn = $('play-library');
 const fileInput = $('rom');
 const changeBtn = $('change-game');
 
+// ?solo=1 → se muestra solo el juego (se usa desde la página de juegos)
+if (new URLSearchParams(location.search).get('solo') === '1') {
+  document.body.classList.add('solo');
+}
+
 let games = [];
 let started = false;
 
