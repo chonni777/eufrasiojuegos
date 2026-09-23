@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Juego</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+    #game { width: 100%; height: 100%; }
+    #error { position: absolute; inset: 0; margin: auto; height: fit-content; padding: 20px;
+             color: #f5b041; font-family: Arial, sans-serif; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <p id="error" hidden></p>
+
+  <script>
+    // Carga el juego indicado en ?juego=<id> (definido en roms/games.json)
+    const DATA_PATH = 'https://cdn.emulatorjs.org/stable/data/';
+
+    function mostrarError(texto) {
+      const el = document.getElementById('error');
+      el.textContent = texto;
+      el.hidden = false;
+    }
+
+    const id = new URLSearchParams(location.search).get('juego');
+
+    fetch('roms/games.json', { cache: 'no-cache' })
+      .then(res => {
+        if (!res.ok) throw new Error('No se encuentra roms/games.json');
+        return res.json();
+      })
+      .then(games => {
+        const game = games.find(g => g.id === id);
+        if (!game) throw new Error('No hay ningún juego con id "' + id + '" en games.json');
+
+        window.EJS_player = '#game';
+        window.EJS_core = 'gba';
+        window.EJS_gameUrl = game.file;
+        window.EJS_gameName = game.title;   // las partidas guardadas van asociadas a este nombre
+        window.EJS_pathtodata = DATA_PATH;
+        window.EJS_startOnLoaded = true;
+        window.EJS_language = 'es-ES';
+
+        const script = document.createElement('script');
+        script.src = DATA_PATH + 'loader.js';
+        script.onerror = () => mostrarError('No se pudo cargar el emulador. Comprueba la conexión a internet.');
+        document.body.appendChild(script);
+      })
+      .catch(err => mostrarError(err.message));
+  </script>
+</body>
+</html>

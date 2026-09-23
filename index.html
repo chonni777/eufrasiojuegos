@@ -112,61 +112,6 @@
         .pvsz { background-image: url("pvsz.png"); }
         .fnafepstein { background-image: url("fnafepstein.jpg"); }
 
-        /* Visor de juegos GBA (se abre encima de la página) */
-        #visor {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            background: #000;
-        }
-
-        #visor[hidden] {
-            display: none;
-        }
-
-        #visor-barra {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 6px 12px;
-            background: #14141f;
-        }
-
-        #visor-titulo {
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        #visor-cerrar {
-            font: inherit;
-            font-weight: bold;
-            padding: 6px 14px;
-            border: none;
-            border-radius: 8px;
-            background: #e74c3c;
-            color: white;
-            cursor: pointer;
-        }
-
-        #visor-cerrar:hover {
-            background: #c0392b;
-        }
-
-        #visor iframe {
-            flex: 1;
-            width: 100%;
-            border: 0;
-        }
-
-        body.jugando {
-            overflow: hidden;
-        }
-
         .volver {
             background-color: #e74c3c;
             background-image: none;
@@ -178,6 +123,65 @@
             background-color: #c0392b;
             transform: scale(1.05);
             filter: none;
+        }
+
+        /* ===== Ventana emergente del juego ===== */
+        #ventana {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        #ventana[hidden] {
+            display: none;
+        }
+
+        .ventana-caja {
+            position: relative;
+            width: min(900px, 95vw, calc(88vh * 1.5));
+            aspect-ratio: 3 / 2;
+            background: #000;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .ventana-caja iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 10px;
+        }
+
+        #ventana-cerrar {
+            position: absolute;
+            top: -16px;
+            right: -16px;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: #e74c3c;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        #ventana-cerrar:hover {
+            background: #c0392b;
+        }
+
+        @media (max-width: 600px) {
+            #ventana-cerrar { top: -44px; right: 0; }
+        }
+
+        body.jugando {
+            overflow: hidden;
         }
     </style>
 </head>
@@ -225,39 +229,34 @@
 
     <a href="https://chonni777.github.io/Calendari-Vicent-Plantada/" class="boton volver">⬅ Volver</a>
 
-    <!-- Visor donde se abre el juego GBA -->
-    <div id="visor" hidden>
-        <div id="visor-barra">
-            <span id="visor-titulo"></span>
-            <button id="visor-cerrar">✕ Cerrar</button>
+    <!-- Ventana emergente donde se abre el juego GBA -->
+    <div id="ventana" hidden>
+        <div class="ventana-caja">
+            <button id="ventana-cerrar" aria-label="Cerrar juego">✕</button>
+            <iframe id="ventana-marco" title="Juego" allow="fullscreen; gamepad; autoplay"></iframe>
         </div>
-        <iframe id="visor-marco" title="Juego" allow="fullscreen; gamepad; autoplay"></iframe>
     </div>
 
     <script>
-        const visor = document.getElementById('visor');
-        const marco = document.getElementById('visor-marco');
+        const ventana = document.getElementById('ventana');
+        const marco = document.getElementById('ventana-marco');
 
         function abrirJuego(game) {
-            document.getElementById('visor-titulo').textContent = game.title;
-            marco.src = 'gba/?juego=' + encodeURIComponent(game.id) + '&solo=1';
-            visor.hidden = false;
+            marco.src = 'gba/jugar.html?juego=' + encodeURIComponent(game.id);
+            ventana.hidden = false;
             document.body.classList.add('jugando');
             marco.addEventListener('load', () => marco.focus(), { once: true });
-            history.pushState({ jugando: true }, ''); // el botón "atrás" del móvil cierra el juego
         }
 
         function cerrarJuego() {
-            marco.src = 'about:blank'; // detiene el emulador y el sonido
-            visor.hidden = true;
+            marco.src = 'about:blank'; // detiene el juego y el sonido
+            ventana.hidden = true;
             document.body.classList.remove('jugando');
         }
 
-        document.getElementById('visor-cerrar').addEventListener('click', () => {
-            if (history.state && history.state.jugando) history.back();
-            else cerrarJuego();
-        });
-        window.addEventListener('popstate', () => { if (!visor.hidden) cerrarJuego(); });
+        document.getElementById('ventana-cerrar').addEventListener('click', cerrarJuego);
+        // Clic en el fondo oscuro también cierra
+        ventana.addEventListener('click', (ev) => { if (ev.target === ventana) cerrarJuego(); });
 
         // Añade a la sección Nintendo los juegos de GBA listados en gba/roms/games.json
         fetch('gba/roms/games.json', { cache: 'no-cache' })
@@ -266,7 +265,7 @@
                 const nintendo = document.getElementById('nintendo');
                 games.forEach(game => {
                     const a = document.createElement('a');
-                    a.href = 'gba/?juego=' + encodeURIComponent(game.id);
+                    a.href = 'gba/jugar.html?juego=' + encodeURIComponent(game.id);
                     a.className = 'boton gba';
                     a.textContent = game.title;
                     if (game.image) a.style.backgroundImage = 'url("' + game.image + '")';
