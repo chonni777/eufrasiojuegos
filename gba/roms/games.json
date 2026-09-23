@@ -1,8 +1,8 @@
 [
-  { "id": "mario-kart", "title": "Mario Kart Super Circuit", "file": "roms/mario-kart.gba", "image": "mariokart.png" }
-  ,{ "id": "firered", "title": "Pokemon Fire Red Version", "file": "roms/firered.gba", "image": "firered.png" }
-  ,{ "id": "ruby", "title": "Pokemon Ruby Version", "file": "roms/ruby.gba", "image": "ruby.png" }
-  ,{ "id": "saphhire", "title": "Pokemon Sapphire Version", "file": "roms/saphhire.gba", "image": "saphhire.png" }
-  ,{ "id": "leafgreen", "title": "Pokemon Leaf Green Version", "file": "roms/leafgreen.gba", "image": "leafgreen.png" }
-  ,{ "id": "ultraviolet", "title": "Pokemon Ultra Violet Version", "file": "roms/ultraviolet.gba", "image": "ultraviolet.png" }
+  { "id": "mario-kart", "title": " ", "file": "roms/mario-kart.gba", "image": "mariokart.png" }
+  ,{ "id": "firered", "title": " ", "file": "roms/firered.gba", "image": "firered.png" }
+  ,{ "id": "ruby", "title": " ", "file": "roms/ruby.gba", "image": "ruby.png" }
+  ,{ "id": "saphhire", "title": " ", "file": "roms/saphhire.gba", "image": "saphhire.png" }
+  ,{ "id": "leafgreen", "title": " ", "file": "roms/leafgreen.gba", "image": "leafgreen.png" }
+  ,{ "id": "ultraviolet", "title": " ", "file": "roms/ultraviolet.gba", "image": "ultraviolet.png" }
 ]
