@@ -24,6 +24,10 @@
             margin: 0 auto 45px;
         }
 
+        .seccion[hidden] {
+            display: none;
+        }
+
         .seccion h2 {
             display: flex;
             align-items: center;
@@ -189,20 +193,53 @@
 
     <h1>Bienvenido a la página de juegos</h1>
 
+    <!-- Los juegos de GBA se colocan solos en su sección según el campo "seccion" de gba/roms/games.json -->
+
     <section class="seccion">
-        <h2>Nintendo</h2>
-        <!-- Los juegos de GBA de gba/roms/games.json se añaden aquí solos -->
-        <div class="contenedor-botones" id="nintendo">
+        <h2>Kirby</h2>
+        <div class="contenedor-botones" id="sec-kirby">
+            <a href="https://chonni777.github.io/Kirby-Super-Star/" class="boton kirby" aria-label="Kirby Super Star"></a>
+        </div>
+    </section>
+
+    <section class="seccion">
+        <h2>Mario</h2>
+        <div class="contenedor-botones" id="sec-mario">
             <a href="https://chonni777.github.io/supermariobros/" class="boton mario" aria-label="Super Mario Bros"></a>
             <a href="https://chonni777.github.io/mario64/" class="boton mario64" aria-label="Super Mario 64"></a>
-            <a href="https://chonni777.github.io/Kirby-Super-Star/" class="boton kirby" aria-label="Kirby Super Star"></a>
+        </div>
+    </section>
+
+    <section class="seccion">
+        <h2>Pokémon</h2>
+        <div class="contenedor-botones" id="sec-pokemon">
             <a href="https://chonni777.github.io/pokemon-esmeralda/" class="boton pokemon">Pokemon Esmeralda</a>
         </div>
     </section>
 
     <section class="seccion">
+        <h2>Zelda</h2>
+        <div class="contenedor-botones" id="sec-zelda"></div>
+    </section>
+
+    <section class="seccion">
+        <h2>RPG</h2>
+        <div class="contenedor-botones" id="sec-rpg"></div>
+    </section>
+
+    <section class="seccion">
+        <h2>Deportes</h2>
+        <div class="contenedor-botones" id="sec-deportes"></div>
+    </section>
+
+    <section class="seccion">
+        <h2>Anime</h2>
+        <div class="contenedor-botones" id="sec-anime"></div>
+    </section>
+
+    <section class="seccion">
         <h2>FNAF</h2>
-        <div class="contenedor-botones">
+        <div class="contenedor-botones" id="sec-fnaf">
             <a href="https://chonni777.github.io/fnaf1/" class="boton fnaf1" aria-label="FNAF 1"></a>
             <a href="https://chonni777.github.io/fnaf2/" class="boton fnaf2" aria-label="FNAF 2"></a>
             <a href="https://chonni777.github.io/fnaf3/" class="boton fnaf3" aria-label="FNAF 3"></a>
@@ -217,7 +254,7 @@
 
     <section class="seccion">
         <h2>Otros</h2>
-        <div class="contenedor-botones">
+        <div class="contenedor-botones" id="sec-otros">
             <a href="https://chonni777.github.io/eufrasiowordle/" class="boton wordle" aria-label="Wordle"></a>
             <a href="https://chonni777.github.io/Geomtry-Dash/" class="boton geometry">Geometry Dash</a>
             <a href="https://chonni777.github.io/snkae/" class="boton snake">Snake</a>
@@ -258,25 +295,32 @@
         // Clic en el fondo oscuro también cierra
         ventana.addEventListener('click', (ev) => { if (ev.target === ventana) cerrarJuego(); });
 
-        // Añade a la sección Nintendo los juegos de GBA listados en gba/roms/games.json
+        // Coloca cada juego de GBA en su sección (campo "seccion" de gba/roms/games.json)
         fetch('gba/roms/games.json', { cache: 'no-cache' })
             .then(res => res.ok ? res.json() : [])
             .then(games => {
-                const nintendo = document.getElementById('nintendo');
                 games.forEach(game => {
+                    const destino = document.getElementById('sec-' + game.seccion)
+                                 || document.getElementById('sec-otros');
                     const a = document.createElement('a');
                     a.href = 'gba/jugar.html?juego=' + encodeURIComponent(game.id);
                     a.className = 'boton gba';
-                    a.textContent = game.title;
-                    if (game.image) a.style.backgroundImage = 'url("' + game.image + '")';
+                    a.style.backgroundImage = 'url("' + game.image + '")';
+                    a.setAttribute('aria-label', game.id);
                     a.addEventListener('click', (ev) => {
                         ev.preventDefault();
                         abrirJuego(game);
                     });
-                    nintendo.appendChild(a);
+                    destino.appendChild(a);
                 });
             })
-            .catch(err => console.warn('No se pudo cargar la lista de juegos GBA:', err));
+            .catch(err => console.warn('No se pudo cargar la lista de juegos GBA:', err))
+            .finally(() => {
+                // Oculta las secciones que se hayan quedado sin juegos
+                document.querySelectorAll('.seccion').forEach(sec => {
+                    sec.hidden = !sec.querySelector('.boton');
+                });
+            });
     </script>
 
 </body>

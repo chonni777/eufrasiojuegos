@@ -1,8 +1,33 @@
 [
-  { "id": "mario-kart", "title": "Mario Kart Super Circuit", "file": "roms/mario-kart.gba", "image": "mariokart.png" }
-  ,{ "id": "firered", "title": "Pokemon Fire Red Version", "file": "roms/firered.gba", "image": "firered.png" }
-  ,{ "id": "ruby", "title": "Pokemon Ruby Version", "file": "roms/ruby.gba", "image": "ruby.png" }
-  ,{ "id": "saphhire", "title": "Pokemon Sapphire Version", "file": "roms/saphhire.gba", "image": "saphhire.png" }
-  ,{ "id": "leafgreen", "title": "Pokemon Leaf Green Version", "file": "roms/leafgreen.gba", "image": "leafgreen.png" }
-  ,{ "id": "ultraviolet", "title": "Pokemon Ultra Violet Version", "file": "roms/ultraviolet.gba", "image": "ultraviolet.png" }
+  {"id": "kirby_mirror", "seccion": "kirby", "file": "roms/kirby_mirror.gba", "image": "kirby_mirror.png"},
+  {"id": "kirby_nightmare", "seccion": "kirby", "file": "roms/kirby_nightmare.gba", "image": "kirby_nightmare.png"},
+
+  {"id": "mario-kart", "seccion": "mario", "file": "roms/mario-kart.gba", "image": "mariokart.png"},
+  {"id": "mario_luigi", "seccion": "mario", "file": "roms/mario_luigi.gba", "image": "mario_luigi.png"},
+  {"id": "marioworld", "seccion": "mario", "file": "roms/marioworld.gba", "image": "marioworld.png"},
+  {"id": "mariobros3", "seccion": "mario", "file": "roms/mariobros3.gba", "image": "mariobros3.png"},
+  {"id": "marioyoshi", "seccion": "mario", "file": "roms/marioyoshi.gba", "image": "marioyoshi.png"},
+  {"id": "donkeykong", "seccion": "mario", "file": "roms/donkeykong.gba", "image": "donkeykong.png"},
+  {"id": "warioland", "seccion": "mario", "file": "roms/warioland.gba", "image": "warioland.png"},
+
+  {"id": "firered", "seccion": "pokemon", "file": "roms/firered.gba", "image": "firered.png"},
+  {"id": "leafgreen", "seccion": "pokemon", "file": "roms/leafgreen.gba", "image": "leafgreen.png"},
+  {"id": "ruby", "seccion": "pokemon", "file": "roms/ruby.gba", "image": "ruby.png"},
+  {"id": "saphhire", "seccion": "pokemon", "file": "roms/saphhire.gba", "image": "saphhire.png"},
+
+  {"id": "zelda_minishcup", "seccion": "zelda", "file": "roms/zelda_minishcup.gba", "image": "zelda_minishcup.png"},
+  {"id": "zeldapast", "seccion": "zelda", "file": "roms/zeldapast.gba", "image": "zeldapast.png"},
+
+  {"id": "FF6", "seccion": "rpg", "file": "roms/FF6.gba", "image": "FF6.png"},
+  {"id": "sims2", "seccion": "rpg", "file": "roms/sims2.gba", "image": "sims2.png"},
+
+  {"id": "fifa07", "seccion": "deportes", "file": "roms/fifa07.gba", "image": "fifa07.png"},
+  {"id": "mundial06", "seccion": "deportes", "file": "roms/mundial06.gba", "image": "mundial06.png"},
+  {"id": "f102", "seccion": "deportes", "file": "roms/f102.gba", "image": "f102.png"},
+
+  {"id": "naruto", "seccion": "anime", "file": "roms/naruto.gba", "image": "naruto.png"},
+  {"id": "dragon ball_adventure", "seccion": "anime", "file": "roms/dragon ball_adventure.gba", "image": "dragon ball_adventure.png"},
+  {"id": "Dragon_Ball_Z_Supersonic", "seccion": "anime", "file": "roms/Dragon_Ball_Z_Supersonic.gba", "image": "Dragon_Ball_Z_Supersonic.png"},
+
+  {"id": "metroid", "seccion": "otros", "file": "roms/metroid.gba", "image": "metroid.png"}
 ]
