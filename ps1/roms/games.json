@@ -1,8 +1,8 @@
 [
     {
-        "id": "GTA1",
-        "rom": "GTA1.chd",
-        "image": "ps1/roms/GTA1.jpg",
+        "id": "fifa98",
+        "rom": "fifa98.chd",
+        "image": "ps1/roms/fifa98.png",
         "seccion": "otros"
     }
 ]
