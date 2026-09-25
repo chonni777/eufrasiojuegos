@@ -96,6 +96,60 @@
             text-shadow: none;
         }
 
+        /* ===== Favoritos ===== */
+        .tarjeta {
+            position: relative;
+            display: inline-flex;
+        }
+
+        .estrella {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            z-index: 2;
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.55);
+            color: white;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .estrella:hover {
+            transform: scale(1.15);
+        }
+
+        .estrella.activa {
+            color: #f1c40f;
+        }
+
+        .boton-favoritos {
+            margin: -10px 0 30px;
+            padding: 10px 22px;
+            border: 2px solid #f1c40f;
+            border-radius: 25px;
+            background: transparent;
+            color: #f1c40f;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .boton-favoritos:hover,
+        .boton-favoritos[aria-pressed="true"] {
+            background: #f1c40f;
+            color: #1e1e2f;
+        }
+
+        .sin-favoritos {
+            color: #9a9ab8;
+        }
+
         .wordle { background-image: url("wordle.png"); }
         .geometry { background-image: url("geometrydash.jpg"); }
         .mario { background-image: url("mario.png"); }
@@ -192,6 +246,14 @@
 <body>
 
     <h1>Bienvenido a la página de juegos</h1>
+
+    <button type="button" class="boton-favoritos" id="ver-favoritos" aria-pressed="false">⭐ Mis favoritos</button>
+
+    <section class="seccion" id="favoritos" hidden>
+        <h2>Favoritos</h2>
+        <div class="contenedor-botones" id="sec-favoritos"></div>
+        <p class="sin-favoritos" id="sin-favoritos">Todavía no tienes favoritos. Pulsa la ☆ de un juego para añadirlo.</p>
+    </section>
 
     <!-- Los juegos de GBA se colocan solos en su sección según el campo "seccion" de gba/roms/games.json -->
 
@@ -307,20 +369,118 @@
                     a.className = 'boton gba';
                     a.style.backgroundImage = 'url("' + game.image + '")';
                     a.setAttribute('aria-label', game.id);
-                    a.addEventListener('click', (ev) => {
-                        ev.preventDefault();
-                        abrirJuego(game);
-                    });
+                    a.dataset.gba = game.id;
                     destino.appendChild(a);
                 });
             })
             .catch(err => console.warn('No se pudo cargar la lista de juegos GBA:', err))
             .finally(() => {
                 // Oculta las secciones que se hayan quedado sin juegos
-                document.querySelectorAll('.seccion').forEach(sec => {
+                document.querySelectorAll('.seccion:not(#favoritos)').forEach(sec => {
                     sec.hidden = !sec.querySelector('.boton');
                 });
+                prepararFavoritos();
             });
+
+        // Los juegos GBA (también sus copias en Favoritos) se abren en la ventana emergente
+        document.addEventListener('click', (ev) => {
+            const a = ev.target.closest('a[data-gba]');
+            if (!a) return;
+            ev.preventDefault();
+            abrirJuego({ id: a.dataset.gba });
+        });
+
+        // ===== Favoritos (se guardan en el navegador con localStorage) =====
+        const CLAVE_FAVORITOS = 'eufrasiojuegos-favoritos';
+        const contFavoritos = document.getElementById('sec-favoritos');
+        const botonVerFavoritos = document.getElementById('ver-favoritos');
+
+        function leerFavoritos() {
+            try {
+                return JSON.parse(localStorage.getItem(CLAVE_FAVORITOS)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function guardarFavoritos(lista) {
+            try {
+                localStorage.setItem(CLAVE_FAVORITOS, JSON.stringify(lista));
+            } catch (e) {
+                console.warn('No se pudieron guardar los favoritos:', e);
+            }
+        }
+
+        // Cada juego se identifica por su enlace
+        function idJuego(a) {
+            return a.getAttribute('href');
+        }
+
+        // Envuelve un botón de juego y le añade la estrella
+        function crearTarjeta(a) {
+            const tarjeta = document.createElement('div');
+            tarjeta.className = 'tarjeta';
+            a.replaceWith(tarjeta);
+            tarjeta.appendChild(a);
+
+            const estrella = document.createElement('button');
+            estrella.type = 'button';
+            estrella.className = 'estrella';
+            estrella.dataset.juego = idJuego(a);
+            estrella.addEventListener('click', () => alternarFavorito(idJuego(a)));
+            tarjeta.appendChild(estrella);
+        }
+
+        function alternarFavorito(id) {
+            const favs = leerFavoritos();
+            const i = favs.indexOf(id);
+            if (i === -1) favs.push(id); else favs.splice(i, 1);
+            guardarFavoritos(favs);
+            pintarFavoritos();
+        }
+
+        function pintarFavoritos() {
+            const favs = leerFavoritos();
+
+            // Actualiza todas las estrellas
+            document.querySelectorAll('.estrella').forEach(est => {
+                const activa = favs.includes(est.dataset.juego);
+                est.classList.toggle('activa', activa);
+                est.textContent = activa ? '★' : '☆';
+                est.setAttribute('aria-label', activa ? 'Quitar de favoritos' : 'Añadir a favoritos');
+                est.title = est.getAttribute('aria-label');
+            });
+
+            // Rellena la sección de Favoritos con copias de los juegos
+            contFavoritos.innerHTML = '';
+            favs.forEach(id => {
+                const original = [...document.querySelectorAll('.seccion:not(#favoritos) .boton')]
+                    .find(a => idJuego(a) === id);
+                if (!original) return;
+                const tarjeta = original.parentElement.cloneNode(true);
+                tarjeta.querySelector('.estrella')
+                    .addEventListener('click', () => alternarFavorito(id));
+                contFavoritos.appendChild(tarjeta);
+            });
+
+            document.getElementById('sin-favoritos').hidden = contFavoritos.children.length > 0;
+        }
+
+        // El botón "Mis favoritos" muestra solo los favoritos, o vuelve a mostrarlo todo
+        botonVerFavoritos.addEventListener('click', () => {
+            const soloFavoritos = botonVerFavoritos.getAttribute('aria-pressed') !== 'true';
+            botonVerFavoritos.setAttribute('aria-pressed', soloFavoritos);
+            botonVerFavoritos.textContent = soloFavoritos ? '🎮 Ver todos los juegos' : '⭐ Mis favoritos';
+            document.getElementById('favoritos').hidden = !soloFavoritos;
+            document.querySelectorAll('.seccion:not(#favoritos)').forEach(sec => {
+                sec.hidden = soloFavoritos || !sec.querySelector('.boton');
+            });
+        });
+
+        function prepararFavoritos() {
+            document.querySelectorAll('.seccion:not(#favoritos) .boton').forEach(crearTarjeta);
+            pintarFavoritos();
+        }
     </script>
 
 </body>
