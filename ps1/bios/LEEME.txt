@@ -1,0 +1,3 @@
+Carpeta opcional para la BIOS de PlayStation.
+Si pones aqui el archivo scph5501.bin, cambia USAR_BIOS a true en ps1/jugar.html.
+Sin BIOS el emulador tambien funciona, pero algunos juegos van mejor con ella.

@@ -83,17 +83,26 @@
             outline-offset: 3px;
         }
 
-        /* Etiqueta para los juegos de Game Boy Advance */
-        .boton.gba::after {
-            content: "GBA";
+        /* Etiquetas de consola en los juegos emulados */
+        .boton.gba::after,
+        .boton.ps1::after {
             position: absolute;
             top: 8px;
             right: 8px;
             padding: 2px 8px;
             border-radius: 6px;
-            background: #4a3f9a;
             font-size: 12px;
             text-shadow: none;
+        }
+
+        .boton.gba::after {
+            content: "GBA";
+            background: #4a3f9a;
+        }
+
+        .boton.ps1::after {
+            content: "PS1";
+            background: #1f5fa8;
         }
 
         /* ===== Favoritos ===== */
@@ -198,6 +207,7 @@
             display: none;
         }
 
+        /* Formato GBA (3:2) por defecto */
         .ventana-caja {
             position: relative;
             width: min(900px, 95vw, calc(88vh * 1.5));
@@ -205,6 +215,12 @@
             background: #000;
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Formato PlayStation (4:3) */
+        .ventana-caja[data-consola="ps1"] {
+            width: min(900px, 95vw, calc(88vh * 4 / 3));
+            aspect-ratio: 4 / 3;
         }
 
         .ventana-caja iframe {
@@ -255,7 +271,8 @@
         <p class="sin-favoritos" id="sin-favoritos">Todavía no tienes favoritos. Pulsa la ☆ de un juego para añadirlo.</p>
     </section>
 
-    <!-- Los juegos de GBA se colocan solos en su sección según el campo "seccion" de gba/roms/games.json -->
+    <!-- Los juegos de GBA y PS1 se colocan solos en su sección según el campo "seccion"
+         de gba/roms/games.json y ps1/roms/games.json -->
 
     <section class="seccion">
         <h2>Kirby</h2>
@@ -328,7 +345,7 @@
 
     <a href="https://chonni777.github.io/Calendari-Vicent-Plantada/" class="boton volver">⬅ Volver</a>
 
-    <!-- Ventana emergente donde se abre el juego GBA -->
+    <!-- Ventana emergente donde se abren los juegos de GBA y PS1 -->
     <div id="ventana" hidden>
         <div class="ventana-caja">
             <button id="ventana-cerrar" aria-label="Cerrar juego">✕</button>
@@ -338,10 +355,15 @@
 
     <script>
         const ventana = document.getElementById('ventana');
+        const caja = ventana.querySelector('.ventana-caja');
         const marco = document.getElementById('ventana-marco');
 
-        function abrirJuego(game) {
-            marco.src = 'gba/jugar.html?juego=' + encodeURIComponent(game.id);
+        // Consolas integradas: cada una tiene su carpeta con jugar.html y roms/games.json
+        const CONSOLAS = ['gba', 'ps1'];
+
+        function abrirJuego(consola, id) {
+            marco.src = consola + '/jugar.html?juego=' + encodeURIComponent(id);
+            caja.dataset.consola = consola;
             ventana.hidden = false;
             document.body.classList.add('jugando');
             marco.addEventListener('load', () => marco.focus(), { once: true });
@@ -357,37 +379,39 @@
         // Clic en el fondo oscuro también cierra
         ventana.addEventListener('click', (ev) => { if (ev.target === ventana) cerrarJuego(); });
 
-        // Coloca cada juego de GBA en su sección (campo "seccion" de gba/roms/games.json)
-        fetch('gba/roms/games.json', { cache: 'no-cache' })
-            .then(res => res.ok ? res.json() : [])
-            .then(games => {
-                games.forEach(game => {
-                    const destino = document.getElementById('sec-' + game.seccion)
-                                 || document.getElementById('sec-otros');
-                    const a = document.createElement('a');
-                    a.href = 'gba/jugar.html?juego=' + encodeURIComponent(game.id);
-                    a.className = 'boton gba';
-                    a.style.backgroundImage = 'url("' + game.image + '")';
-                    a.setAttribute('aria-label', game.id);
-                    a.dataset.gba = game.id;
-                    destino.appendChild(a);
-                });
-            })
-            .catch(err => console.warn('No se pudo cargar la lista de juegos GBA:', err))
-            .finally(() => {
-                // Oculta las secciones que se hayan quedado sin juegos
-                document.querySelectorAll('.seccion:not(#favoritos)').forEach(sec => {
-                    sec.hidden = !sec.querySelector('.boton');
-                });
-                prepararFavoritos();
-            });
+        // Coloca cada juego en su sección (campo "seccion" de <consola>/roms/games.json)
+        function añadirJuego(consola, game) {
+            const destino = document.getElementById('sec-' + game.seccion)
+                         || document.getElementById('sec-otros');
+            const a = document.createElement('a');
+            a.href = consola + '/jugar.html?juego=' + encodeURIComponent(game.id);
+            a.className = 'boton ' + consola;
+            a.style.backgroundImage = 'url("' + game.image + '")';
+            a.setAttribute('aria-label', game.id);
+            a.dataset.consola = consola;
+            a.dataset.juego = game.id;
+            destino.appendChild(a);
+        }
 
-        // Los juegos GBA (también sus copias en Favoritos) se abren en la ventana emergente
+        Promise.all(CONSOLAS.map(consola =>
+            fetch(consola + '/roms/games.json', { cache: 'no-cache' })
+                .then(res => res.ok ? res.json() : [])
+                .then(games => games.forEach(game => añadirJuego(consola, game)))
+                .catch(err => console.warn('No se pudo cargar la lista de ' + consola + ':', err))
+        )).then(() => {
+            // Oculta las secciones que se hayan quedado sin juegos
+            document.querySelectorAll('.seccion:not(#favoritos)').forEach(sec => {
+                sec.hidden = !sec.querySelector('.boton');
+            });
+            prepararFavoritos();
+        });
+
+        // Los juegos de consola (también sus copias en Favoritos) se abren en la ventana emergente
         document.addEventListener('click', (ev) => {
-            const a = ev.target.closest('a[data-gba]');
+            const a = ev.target.closest('a[data-consola]');
             if (!a) return;
             ev.preventDefault();
-            abrirJuego({ id: a.dataset.gba });
+            abrirJuego(a.dataset.consola, a.dataset.juego);
         });
 
         // ===== Favoritos (se guardan en el navegador con localStorage) =====
